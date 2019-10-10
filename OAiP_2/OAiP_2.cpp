@@ -4,7 +4,8 @@
 #include <iostream>
 #include <math.h>
 using namespace std;
-/*
+/*  Лаба 2.1
+
 int main()
 {
 	setlocale(LC_ALL, "Russian");
@@ -26,7 +27,8 @@ int main()
 	return 0;
 }
 */
-
+// Лаба 2.2
+/*
 int main()
 {
 	setlocale(LC_ALL, "Russian");
@@ -75,7 +77,7 @@ int main()
 	y = tmp * tmp * tmp;
 	cout << "Результат выислений " << y << endl;
 	return 0;
-}
+}*/
 
 double min(double a, double b)
 {

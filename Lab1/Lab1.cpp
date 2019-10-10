@@ -24,7 +24,7 @@ int main()
 
 //Уровень сложности 2, пример 7
 
-/*int main()
+int main()
 {
 	setlocale(LC_ALL, "Russian");
 	double z1, z2, a, b, tmp1, tmp2;
@@ -62,12 +62,11 @@ int main()
 	cout << "Результат вычисления z1 = " << z1 << endl;
 	cout << "Результат вычисления z2 = " << z2 << endl;
 	return 0;
-}*/
-
+}
 
 //Уровень сложности 3, пример 7
 
-/*int main()
+int main()
 {
 	setlocale(LC_ALL, "Russian");
 	double gamma, x, y, z, tmp1, tmp2, tmp3;
@@ -89,11 +88,11 @@ int main()
 	gamma = 5 * atan(x) - 1. / 4 * acos(x) * tmp3;
 	cout << "Результат вычислений = " << gamma << endl;
 	return 0;
-}*/
+}
 
 //Уровень сложности 3, пример 8
 
-/*int main()
+int main()
 {
 	setlocale(LC_ALL, "Russian");
 	double fi, x, y, z, tmp1, tmp2, tmp3, tmp4;
@@ -124,7 +123,7 @@ int main()
 	cout << "Результат вычислений = " <<  fi << endl;
 	return 0;
 
-}*/
+}
 
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
