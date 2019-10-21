@@ -10,7 +10,7 @@ using namespace std;
 void InputData(int* arrPtr, int arrSize);
 void RandomFill(int* arrPtr, int arrSize);
 void PrintArray(const char* arrayName, int* array, int size);
-
+/*
 int main()
 {
 	
@@ -37,16 +37,17 @@ int main()
 	for (int i = 0; i < i_v; ++i) {
 		sum += array[i];
 	}
-	cout << "Сумма до первого минимального элемента"<<sum;
+	cout << "Сумма до первого минимального элемента="<<sum;
 	delete[] array;
-}
+	return 0;
+}*/
 
-/*
+
 int main() {
-
+	srand(time(NULL));
 	setlocale(LC_ALL, "Russian");
 	short select;
-	int size, sum = 0;
+	int size, sum = 0, i_p=-1, i_n=-1;
 	cout << "Введите размер массива, от 1 до 20" << endl;
 	cin >> size;
 	while ((size < 1 || size > 20)) {
@@ -64,20 +65,40 @@ int main() {
 	}
 	if (select == 1) {
 		RandomFill(array, size);
+		PrintArray("array", array, size);
 	}
 	else InputData(array, size);
 	for (int i = 0; i < size; i++) {
 		if (array[i] > 0) {
-			while (i < size && array[i] > 0) {
-				sum += array[i++];
-			}
-		 break;
+			i_p = i;
+			break;
 		}
+	}
+	for (int i = i_p; i < size; ++i) {
+		if (array[i] < 0) {
+			i_n = i;
+			break;
+		}
+	}
+	if (i_n == i_p+1) {
+		cout << "Складывать нечего, положительный и отрицательный находятся рядом";
+		return -1;
+	}
+	if (i_n == -1) {
+		cout << "нет отрицательных элементов после положительного" << endl;
+		return -1;
+	}
+	if (i_p == -1) {
+		cout << "Нет положительных элементов";
+		return -1;
+	}
+	for (int i = ++i_p; i < i_n; ++i) {
+		sum += array[i];
 	}
 	cout << "Сумма элементов от первого положительного до первого отрицательного = " << sum << endl;
 	delete[] array;
 	return 0;
-}*/
+}
 
 /*int Solve(int* dynamicArray1, int* dynamicArray2, int size1, int size2) {
 	int min = INT_MAX, i, j;
@@ -143,12 +164,13 @@ int main()
 
 void RandomFill(int* arrPtr, int arrSize) {
 	for (int i = 0; i < arrSize; i++) {
-		arrPtr[i] = -10000 + rand() % 100000;
+		arrPtr[i] = -100 + rand() % 1000;
 	}
 }
 
 void InputData(int* arrPtr, int arrSize) {
 	for (int i = 0; i < arrSize; i++) {
+		cout << "array[" << i << "]=";
 		while (!(cin >> arrPtr[i]) || cin.get() != '\n') {
 			cout << "Вы ввели не число, повториве ввод элемента" << endl;
 			cin.clear();

@@ -1,21 +1,58 @@
 ﻿
 #define _CRT_SECURE_NO_WARNINGS
+#define STUD_SIZE sizeof(Student)
 #include <iostream>
 #include <stdio.h>
 #include "student.h"
 
-
-
 using namespace std;
-void Flush_Stream() {
-	while (cin.get() != '\n') {};
+
+long GetFileSize(const char* filepath) {
+	FILE* fptr = fopen(filepath, "rb");
+	fseek(fptr, 0L, SEEK_END);
+	long fileSize = ftell(fptr);
+	return fileSize;
 }
+void Rewrite(Student* stud, const char* filepath, int struct_count) {
+	FILE* fw = fopen(filepath, "wb");
+	for (int i = 0; i < struct_count; ++i) {
+		fwrite(&stud[i], STUD_SIZE, 1, fw);
+	}
+}
+Student* Edit(const char* filepath) {
+	char FIO[50];
+	short select;
+	cout << "Введите ФИО студента для редактирования" << endl;
+	cin >> FIO;
+	long struct_count = GetFileSize(filepath)/STUD_SIZE;
+	FILE* fpt1 = fopen(filepath, "rb");
+	Student* stArray = new Student[struct_count];
+	for (int i = 0; i < struct_count; i++) {
+		fread(&stArray[i], STUD_SIZE, 1, fpt1);
+		if (*(stArray[i].FIO) == *FIO) {
+			cout << "Выберите поле для редактирования: 1-ФИО\n\t 2-Номер группы\n\t 3-Оценка по физике\n\t 4-Оценка по математике\n\t 5-Оценка по иноформатике\n\t 6-Cредний балл" << endl;
+			cin >> select;
+			switch (select) {
+				case 1:
+					cout << "Введите новое ФИО" << endl;
+					cin >> stArray[i].FIO;
+					Rewrite(stArray, filepath, struct_count);
+			}
+		}
+	}
+	return stArray;
+}
+void Average(Student* ptr) {
+	 ptr->average = (ptr->inf_mark + ptr->math_mark + ptr->phys_mark) / 3;
+}
+
 void Output(Student* stud) {
 	cout << "=========================++++++++++++============================" << endl;
 	cout << "Имя: " << stud->FIO << "\nНомер группы: " << stud->groupNumber << "\n\t+-------------------+" << endl;
-	cout << "Средний балл по физикие: " << stud->phys_mark << endl;
-	cout << "Средний балл по математике: " << stud->math_mark << endl;
-	cout << "Средний балл по информатике: " << stud->inf_mark << endl;
+	cout << "Оценка по физикие: " << stud->phys_mark << endl;
+	cout << "Оценка по математике: " << stud->math_mark << endl;
+	cout << "Оценка балл по информатике: " << stud->inf_mark << endl;
+	cout << "Средний балл " << stud->average << endl;
 	cout << "=========================++++++++++++============================" << endl;
 }
 
@@ -24,15 +61,13 @@ bool Create_New(const char* filePath) {
 	return fp == NULL ? false : true;
 }
 
+
+
 void Open_Read(const char* filePath) {
 	FILE* fp2 = fopen(filePath, "rb");
 	Student st;
 	while (true) {
-		if(!fread(&st.FIO, sizeof(st.FIO), 1, fp2)) break;
-		fread(&(st.groupNumber), 4, 1, fp2);
-		fread(&(st.inf_mark), 8, 1, fp2);
-		fread(&(st.phys_mark), 8, 1, fp2);
-		fread(&(st.math_mark), 8, 1, fp2);
+		if (!fread(&st, sizeof(Student), 1, fp2)) break;
 		Output(&st);
 	}
 	fclose(fp2);
@@ -41,11 +76,7 @@ bool Append(const char* filePath, Student* ptr) {
 	try {
 		FILE* fp1 = fopen(filePath, "ab");
 		if (fp1 == NULL) throw("Error opening file!");
-		fwrite(&ptr->FIO, sizeof(ptr->FIO), 1, fp1);
-		fwrite(&ptr->groupNumber, 4, 1, fp1);
-		fwrite(&ptr->inf_mark, 8, 1, fp1);
-		fwrite(&ptr->phys_mark, 8, 1, fp1);
-		fwrite(&ptr->math_mark, 8, 1, fp1);
+		fwrite(ptr, sizeof(Student), 1, fp1);
 		fclose(fp1);
 		return true;
 	}
@@ -54,15 +85,17 @@ bool Append(const char* filePath, Student* ptr) {
 		return false;
 	}
 }
-
 int main()
 {
 	setlocale(LC_ALL, "Russian");
 	short select;
-
 	do {
-		char* FILE_PATH = new char[100];
-		cout << "Выберите желаемое действие:\n\t 1.Создать файл\n\t 2.Открыть файл\n\t 3.Добавить новую запись\n\t 4.Выход из программы\n\t" << endl;
+		FILE* fp3;
+		int struct_count;
+		Student* StudPtr = new Student;
+		Student* stArray;
+		char FILE_PATH[100];
+		cout << "Выберите желаемое действие:\n\t 1.Создать файл\n\t 2.Открыть файл\n\t 3.Добавить новую запись\n\t 4.Найти студентов, имеющих не ниже 4 по математике\n\t 5.Выход из программы\n\t" << endl;
 		cin >> select;
 		switch (select) {
 			case 1: 
@@ -79,21 +112,39 @@ int main()
 				Open_Read(FILE_PATH);
 				break;
 			case 3:
-				Student* StudPtr = new Student;
 				cout << "введите имя октрываемого файла:" << endl;
 				cin >> FILE_PATH;
 				cout << "Введите ФИО студента" << endl;
-				cin.sync_with_stdio();
+				cin.sync();
 				cin >> StudPtr->FIO;
 				cout << "Введите номер группы" << endl;
 				cin >> StudPtr->groupNumber;
-				cout << "Введите средний балл по математике, физике, информатике через пробел." << endl;
+				cout << "Введите оценки по математике, физике, информатике через пробел." << endl;
 				cin >> StudPtr->math_mark >> StudPtr->phys_mark >> StudPtr->inf_mark;
+				Average(StudPtr);
 				if (!Append(FILE_PATH, StudPtr)) {
 					break;
 				};
+				
 				delete StudPtr;
 				break;
+			case 4:
+				cout << "введите имя открываемого файла" << endl;
+				cin >> FILE_PATH;
+				fp3 = fopen(FILE_PATH, "rb");
+				struct_count = GetFileSize(FILE_PATH) / sizeof(Student);
+				stArray = new Student[struct_count];
+				for (int i = 0; i < struct_count; ++i) {
+					fread(&stArray[i], sizeof(Student), 1, fp3);
+					if (stArray[i].math_mark >= 4 && stArray[i].inf_mark >= 4) {
+						Output(&stArray[i]);
+					}
+				}
+				break;
+			case 5:
+				cout << "введите имя открываемого файла" << endl;
+				cin >> FILE_PATH;
+				Edit(FILE_PATH);
 		}
 	} while (select == 1 || select == 2 || select == 3);
 	_fcloseall();
