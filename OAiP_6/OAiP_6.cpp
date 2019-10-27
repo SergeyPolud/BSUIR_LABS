@@ -63,8 +63,7 @@ int main() {
 			save = strptr + i;
 			ConcatNumbers(result, save, index, i);
 			if (*(strptr + i) == '.') {
-				result[index] = '.';
-				index++;
+				result[index++] = '.';
 				output = ConcatNumbers(result, strptr+i+1, index, i);
 			}
 			else {

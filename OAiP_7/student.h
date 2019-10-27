@@ -1,4 +1,3 @@
-
 struct Student
 {
 	char FIO[30];
