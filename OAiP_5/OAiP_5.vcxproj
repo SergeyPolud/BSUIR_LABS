@@ -153,6 +153,9 @@
   <ItemGroup>
     <ClCompile Include="OAiP_5.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OAiP_5.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

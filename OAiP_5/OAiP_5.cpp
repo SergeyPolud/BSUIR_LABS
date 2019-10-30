@@ -2,52 +2,192 @@
 //
 #include <iomanip>
 #include <iostream>
+#include "OAiP_5.h"
 using namespace std;
 
-double Sum(double* line, int size) 
-{
-	double sum = 0;
-	for (int i = 0; i < size; ++i) 
-	{
-		sum += line[i];
-	}
-	return sum;
-}
+void Print(double** matrix, int n, int m);
+double** RandomFill(double** matrix, int n, int m);
+double** InputData(double** matrix, int n, int m);
+bool DotProduct(double** matrix, int n);
+bool SelfDotProduct(double** matrix, int n);
 
-int main()
-{
+//
+//double Sum(double* line, int size) 
+//{
+//	double sum = 0;
+//	for (int i = 0; i < size; ++i) 
+//	{
+//		sum += line[i];
+//	}
+//	return sum;
+//}
+//
+//int main()
+//{
+//	setlocale(LC_ALL, "Russian");
+//	int n, m;
+//	cout << "Введите размер матрицы n*m" << endl;
+//	cin >> n >> m;
+//	double** matrix;
+//	matrix = new double* [n];
+//	for (int i = 0; i < n; ++i) {
+//		matrix[i] = new double [m];
+//	}
+//	cout << "введите элементы матрицы" << endl;
+//	cout << endl;
+//	for (int i = 0; i < n; ++i) 
+//	{
+//		for (int j = 0; j < m; ++j) 
+//		{
+//			cout << "[" << i << "]" << "[" << j << "]=";
+//			cin >> matrix[i][j];
+//
+//		}
+//		cout << endl;
+//	}
+//	for (int i = 0; i < n; ++i)
+//	{
+//		for (int j = 0; j < m; ++j)
+//		{
+//			if (matrix[i][j] < 0) 
+//			{
+//				cout << "Сумма в " << i+1 << " строке = " << Sum(matrix[i], m);
+//			}
+//		}
+//	}
+//	delete[] matrix;
+//	return 0;
+//}
+
+//int main() {
+//	setlocale(LC_ALL, "Russian");
+//	int n, m;
+//	cout << "Введите размер матрицы n*m" << endl;
+//	cin >> n >> m;
+//	double** matrix;
+//	matrix = new double* [n];
+//	for (int i = 0; i < n; ++i) {
+//		matrix[i] = new double[m];
+//	}
+//	short selector;
+//	cout << "1. Заполнить рандомно.\n2. Ввод с клавиатуры.\n";
+//	cin >> selector;
+//	switch (selector) {
+//		case 1:
+//			matrix = RandomFill(matrix, n, m);
+//			break;
+//		case 2:
+//			matrix = InputData(matrix, n, m);
+//			break;
+//	}
+//	cout << "---------------------------" << endl;
+//	double* tmp;
+//	for (int i = 0; i < n - 1; i++) {
+//		for (int j = i + 1; j < n; j++) {
+//			if (*matrix[i] > *matrix[j]) {
+//				tmp = matrix[i];
+//				matrix[i] = matrix[j];
+//				matrix[j] = tmp;
+//			}
+//		}
+//	}
+//	cout << "Результат сортировки строк по первым элементам" << endl;
+//	cout << "---------------------------" << endl;
+//	Print(matrix, n, m);
+//	return 0;
+//}
+
+
+int main() {
 	setlocale(LC_ALL, "Russian");
-	int n, m;
-	cout << "Введите размер матрицы n*m" << endl;
-	cin >> n >> m;
+	int n ;
+	cout << "Введите размер матрицы n" << endl;
+	cin >> n ;
 	double** matrix;
 	matrix = new double* [n];
 	for (int i = 0; i < n; ++i) {
-		matrix[i] = new double [m];
+		matrix[i] = new double[n];
 	}
-	cout << "введите элементы матрицы" << endl;
-	cout << endl;
-	for (int i = 0; i < n; ++i) 
-	{
-		for (int j = 0; j < m; ++j) 
-		{
-			cout << "[" << i << "]" << "[" << j << "]=";
-			cin >> matrix[i][j];
+	short selector;
+	cout << "1. Заполнить рандомно.\n2. Ввод с клавиатуры.\n";
+	cin >> selector;
+	switch (selector) {
+	case 1:
+		matrix = RandomFill(matrix, n, n);
+		break;
+	case 2:
+		matrix = InputData(matrix, n, n);
+		break;
+	}
+	cout << "---------------------------" << endl;
+	if (DotProduct(matrix, n) && SelfDotProduct(matrix, n)) {
+		cout << "Матрица является ортонормированной" << endl;
+		delete[] matrix;
+	}
+	else {
+		cout << "Матрица НЕ является ортонормированной" << endl;
+		delete[] matrix;
+	}
+	return 0;
+}
 
+bool SelfDotProduct(double** matrix, int n) {
+	for (int i = 0; i < n; ++i) {
+		double dot_product = 0;
+		for (int j = 0; j < n; j++) {
+			dot_product += matrix[i][j] * matrix[i][j];
+		}
+		if (dot_product != 1) return false;
+	}
+	return true;
+}
+
+bool DotProduct(double** matrix, int n) {
+	for (int i = 0; i < n-1; ++i) {
+		double dot_product = 0;
+		for (int j = 0; j < n; j++) {
+			dot_product += matrix[i][j] * matrix[i + 1][j];
+		}
+		if (dot_product != 0) return false;
+	}
+	return true;
+}
+
+
+void Print(double** matrix, int n, int m) {
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			cout << setw(7) << matrix[i][j];
 		}
 		cout << endl;
 	}
+}
+double** RandomFill(double** matrix, int n, int m) {
+	srand(time(NULL));
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			matrix[i][j] = -50 + double(rand() % 10000) / 100;
+		}
+	}
+	cout << "Сгенерированная матрица:\n";
+	Print(matrix, n, m);
+	return matrix;
+}
+double** InputData(double** matrix, int n, int m) {
+	cout << "введите элементы матрицы" << endl;
+	cout << endl;
 	for (int i = 0; i < n; ++i)
 	{
 		for (int j = 0; j < m; ++j)
 		{
-			if (matrix[i][j] < 0) 
-			{
-				cout << "Сумма в " << i+1 << " строке = " << Sum(matrix[i], m);
-			}
+			cout << "[" << i << "]" << "[" << j << "]=";
+			cin >> matrix[i][j];
 		}
+		cout << endl;
 	}
-	delete[] matrix;
-	return 0;
+	cout << "Введенная матрица:\n";
+	Print(matrix, n, m);
+	return matrix;
 }
+
 
