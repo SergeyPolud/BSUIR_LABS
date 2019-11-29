@@ -2,30 +2,18 @@
 #define STUD_SIZE sizeof(Student)
 #include <iostream>
 #include <string>
-//#include "student.h"
+#include "student.h"
 #include <Windows.h>
 
 using namespace std;
 
-struct Student
-{
-	char FIO[30];
-	int groupNumber;
-	double phys_mark;
-	double inf_mark;
-	double math_mark;
-	double average;
-};
-
-long GetFileSize(const char* filepath);
-void Rewrite(Student* stud, const char* filepath, int struct_count);
-void Create_New(const char* filePath);
-Student* Edit(const char* filepath);
-void Output(Student* stud);
-void Open_Read(const char* filePath);
-bool Append(const char* filePath, Student ptr);
-
-
+long GetFileSize(FILE*);
+void Overwrite(Student*, FILE*);
+bool Create_New(const char*);
+Student* Edit(FILE*);
+void Output(Student*);
+void Open_Read(const char*);
+bool Append(const char*, Student);
 
 
 int main()
@@ -45,7 +33,11 @@ int main()
 			case 1: 
 				cout << "Введите имя нового файла" << endl;
 				cin >> FILE_PATH;
-				Create_New(FILE_PATH);
+				if (!Create_New(FILE_PATH)) 
+				{
+					cout << "Ошибка создания файла!!!!";
+					break;
+				}
 				cout << "Успешно создан новый файл " << FILE_PATH << endl;
 				break;
 			case 2:
@@ -66,6 +58,7 @@ int main()
 				Stud.average = (Stud.inf_mark + Stud.math_mark + Stud.phys_mark) / 3;
 				if (!Append(FILE_PATH, Stud)) 
 				{
+					cout << "Ошибка добавления!" << endl;
 					break;
 				};
 				break;
@@ -73,8 +66,10 @@ int main()
 				cout << "введите имя открываемого файла" << endl;
 				cin >> FILE_PATH;
 				fp3 = fopen(FILE_PATH, "rb");
-				while (fread(&Stud, STUD_SIZE, 1, fp3) != NULL) {
-					if (Stud.math_mark >= 4 && Stud.inf_mark >= 4) {
+				while (fread(&Stud, STUD_SIZE, 1, fp3) != NULL) 
+				{
+					if (Stud.math_mark >= 4 && Stud.inf_mark >= 4) 
+					{
 						Output(&Stud);
 					}
 				}
@@ -82,51 +77,52 @@ int main()
 			case 5:
 				cout << "введите имя открываемого файла" << endl;
 				cin >> FILE_PATH;
-				int struct_count = GetFileSize(FILE_PATH) / STUD_SIZE;
-				Rewrite(Edit(FILE_PATH), FILE_PATH, struct_count);
+				FILE* fpt1 = fopen(FILE_PATH, "r+");
+				int struct_count = GetFileSize(fpt1) / STUD_SIZE;
+				Overwrite(Edit(fpt1), fpt1);
 		}
 	} while (select >= 1 && select <= 6);
 	_fcloseall();
 	return 0;
 }
 
-long GetFileSize(const char* filepath)
+long GetFileSize(FILE* file)
 {
-	FILE* fptr = fopen(filepath, "rb");
-	fseek(fptr, 0L, SEEK_END);
-	long fileSize = ftell(fptr);
+	fseek(file, 0L, SEEK_END);
+	long fileSize = ftell(file);
+	fseek(file, 0L, SEEK_SET);
 	return fileSize;
 }
-void Rewrite(Student* stud, const char* filepath, int struct_count)
+void Overwrite(Student* stud, FILE* fpt1)
 {
-	FILE* fw = fopen(filepath, "wb");
-	for (int i = 0; i < struct_count; ++i)
-	{
-		fwrite(&stud[i], STUD_SIZE, 1, fw);
-	}
-	delete[] stud;
-	fclose(fw);
+	int pos = ftell(fpt1);
+	fseek(fpt1, pos - STUD_SIZE, SEEK_SET);
+	fwrite(stud, STUD_SIZE, 1, fpt1);
+	delete stud;
+	fclose(fpt1);
 }
-void Create_New(const char* filePath)
+bool Create_New(const char* filePath)
 {
 	FILE* fp = fopen(filePath, "wb");
+	if (fp == NULL) return false;
 	fclose(fp);
+	return true;
 }
 
-Student* Edit(const char* filepath)
+Student* Edit(FILE* fpt1)
 {
 	char FIO[50];
 	short select;
 	cout << "Введите ФИО студента для редактирования" << endl;
 	cin.ignore();
 	cin.getline(FIO, 50);
-	long struct_count = GetFileSize(filepath) / STUD_SIZE;
-	FILE* fpt1 = fopen(filepath, "rb");
-	Student* stArray = new Student[struct_count];
+	long struct_count = GetFileSize(fpt1) / STUD_SIZE;
+	//Student* stArray = new Student[struct_count];
+	Student* stud = new Student;
 	for (int i = 0; i < struct_count; i++)
 	{
-		fread(&stArray[i], STUD_SIZE, 1, fpt1);
-		if (*(stArray[i].FIO) == *FIO)
+		fread(stud, STUD_SIZE, 1, fpt1);
+		if (*(stud->FIO) == (*FIO))
 		{
 			do
 			{
@@ -137,30 +133,30 @@ Student* Edit(const char* filepath)
 				{
 				case 1:
 					cout << "Введите новое ФИО" << endl;
-					cin >> stArray[i].FIO;
+					cin >> stud->FIO;
 					break;
 				case 2:
 					cout << "введите новый номер группы" << endl;
-					cin >> stArray[i].groupNumber;
+					cin >> stud->groupNumber;
 					break;
 				case 3:
 					cout << "Введите новую Оценку по физике" << endl;
-					cin >> stArray[i].phys_mark;
+					cin >> stud->phys_mark;
 					break;
 				case 4:
 					cout << "Введите новую Оценку по математике" << endl;
-					cin >> stArray[i].math_mark;
+					cin >> stud->math_mark;
 					break;
 				case 5:
 					cout << "Введите новую Оценку по информматике" << endl;
-					cin >> stArray[i].inf_mark;
+					cin >> stud->inf_mark;
 					break;
 				}
 			} while (select > 1 && select < 6);
 		}
-		stArray[i].average = (stArray[i].inf_mark + stArray[i].math_mark + stArray[i].phys_mark) / 3;
+		stud->average = (stud->inf_mark + stud->math_mark + stud->phys_mark) / 3;
 	}
-	return stArray;
+	return stud;
 }
 void Output(Student* stud)
 {
@@ -171,6 +167,7 @@ void Output(Student* stud)
 	cout << "Оценка балл по информатике: " << stud->inf_mark << endl;
 	cout << "Средний балл " << stud->average << endl;
 	cout << "=========================++++++++++++============================" << endl;
+	delete stud;
 }
 void Open_Read(const char* filePath)
 {
