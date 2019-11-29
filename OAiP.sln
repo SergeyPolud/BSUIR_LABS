@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OAiP_7", "OAiP_7\OAiP_7.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OAiP_5", "OAiP_5\OAiP_5.vcxproj", "{50527B17-A08B-4EE9-9811-7CB20A4B55FA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Testing", "Testing\Testing.vcxproj", "{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -101,6 +103,14 @@ Global
 		{50527B17-A08B-4EE9-9811-7CB20A4B55FA}.Release|x64.Build.0 = Release|x64
 		{50527B17-A08B-4EE9-9811-7CB20A4B55FA}.Release|x86.ActiveCfg = Release|Win32
 		{50527B17-A08B-4EE9-9811-7CB20A4B55FA}.Release|x86.Build.0 = Release|Win32
+		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Debug|x64.ActiveCfg = Debug|x64
+		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Debug|x64.Build.0 = Debug|x64
+		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Debug|x86.ActiveCfg = Debug|Win32
+		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Debug|x86.Build.0 = Debug|Win32
+		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Release|x64.ActiveCfg = Release|x64
+		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Release|x64.Build.0 = Release|x64
+		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Release|x86.ActiveCfg = Release|Win32
+		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

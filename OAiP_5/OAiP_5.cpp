@@ -8,20 +8,15 @@ using namespace std;
 void Print(double** matrix, int n, int m);
 double** RandomFill(double** matrix, int n, int m);
 double** InputData(double** matrix, int n, int m);
-bool DotProduct(double** matrix, int n);
-bool SelfDotProduct(double** matrix, int n);
+bool Scalar_Product(double** matrix, int n);
+bool Scalar_Row(double** matrix, int n);
+double Sum(double* line, int size);
 
-//
-//double Sum(double* line, int size) 
-//{
-//	double sum = 0;
-//	for (int i = 0; i < size; ++i) 
-//	{
-//		sum += line[i];
-//	}
-//	return sum;
-//}
-//
+
+
+
+//уровень 1
+
 //int main()
 //{
 //	setlocale(LC_ALL, "Russian");
@@ -30,7 +25,8 @@ bool SelfDotProduct(double** matrix, int n);
 //	cin >> n >> m;
 //	double** matrix;
 //	matrix = new double* [n];
-//	for (int i = 0; i < n; ++i) {
+//	for (int i = 0; i < n; ++i) 
+//	{
 //		matrix[i] = new double [m];
 //	}
 //	cout << "введите элементы матрицы" << endl;
@@ -51,14 +47,17 @@ bool SelfDotProduct(double** matrix, int n);
 //		{
 //			if (matrix[i][j] < 0) 
 //			{
-//				cout << "Сумма в " << i+1 << " строке = " << Sum(matrix[i], m);
+//				cout << "Сумма в " << i+1 << " строке = " << Sum(matrix[i], m) << endl;
+//				break;
 //			}
 //		}
 //	}
 //	delete[] matrix;
 //	return 0;
 //}
-
+//
+//// уровень 2
+//
 //int main() {
 //	setlocale(LC_ALL, "Russian");
 //	int n, m;
@@ -66,13 +65,15 @@ bool SelfDotProduct(double** matrix, int n);
 //	cin >> n >> m;
 //	double** matrix;
 //	matrix = new double* [n];
-//	for (int i = 0; i < n; ++i) {
+//	for (int i = 0; i < n; ++i) 
+//	{
 //		matrix[i] = new double[m];
 //	}
 //	short selector;
 //	cout << "1. Заполнить рандомно.\n2. Ввод с клавиатуры.\n";
 //	cin >> selector;
-//	switch (selector) {
+//	switch (selector) 
+//	{
 //		case 1:
 //			matrix = RandomFill(matrix, n, m);
 //			break;
@@ -82,9 +83,12 @@ bool SelfDotProduct(double** matrix, int n);
 //	}
 //	cout << "---------------------------" << endl;
 //	double* tmp;
-//	for (int i = 0; i < n - 1; i++) {
-//		for (int j = i + 1; j < n; j++) {
-//			if (*matrix[i] > *matrix[j]) {
+//	for (int i = 0; i < n - 1; i++) 
+//	{
+//		for (int j = i + 1; j < n; j++) 
+//		{
+//			if (*matrix[i] > *matrix[j]) 
+//			{
 //				tmp = matrix[i];
 //				matrix[i] = matrix[j];
 //				matrix[j] = tmp;
@@ -94,9 +98,11 @@ bool SelfDotProduct(double** matrix, int n);
 //	cout << "Результат сортировки строк по первым элементам" << endl;
 //	cout << "---------------------------" << endl;
 //	Print(matrix, n, m);
+//	delete[] matrix;
 //	return 0;
-//}
 
+
+//уровень 3
 
 int main() {
 	setlocale(LC_ALL, "Russian");
@@ -105,7 +111,8 @@ int main() {
 	cin >> n ;
 	double** matrix;
 	matrix = new double* [n];
-	for (int i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i) 
+	{
 		matrix[i] = new double[n];
 	}
 	short selector;
@@ -120,52 +127,66 @@ int main() {
 		break;
 	}
 	cout << "---------------------------" << endl;
-	if (DotProduct(matrix, n) && SelfDotProduct(matrix, n)) {
+	if (Scalar_Product(matrix, n) && Scalar_Row(matrix, n)) 
+	{
 		cout << "Матрица является ортонормированной" << endl;
 		delete[] matrix;
 	}
-	else {
+	else 
+	{
 		cout << "Матрица НЕ является ортонормированной" << endl;
 		delete[] matrix;
 	}
 	return 0;
 }
 
-bool SelfDotProduct(double** matrix, int n) {
-	for (int i = 0; i < n; ++i) {
-		double dot_product = 0;
-		for (int j = 0; j < n; j++) {
-			dot_product += matrix[i][j] * matrix[i][j];
+bool Scalar_Row(double** matrix, int n) 
+{
+	for (int i = 0; i < n; ++i) 
+	{
+		double product = 0;
+		for (int j = 0; j < n; j++) 
+		{
+			product += matrix[i][j] * matrix[i][j];
 		}
-		if (dot_product != 1) return false;
+		if (product != 1) return false;
 	}
 	return true;
 }
 
-bool DotProduct(double** matrix, int n) {
-	for (int i = 0; i < n-1; ++i) {
-		double dot_product = 0;
-		for (int j = 0; j < n; j++) {
-			dot_product += matrix[i][j] * matrix[i + 1][j];
+bool Scalar_Product(double** matrix, int n) 
+{
+	for (int i = 0; i < n-1; ++i) 
+	{
+		double product = 0;
+		for (int j = 0; j < n; j++) 
+		{
+			product += matrix[i][j] * matrix[i + 1][j];
 		}
-		if (dot_product != 0) return false;
+		if (product != 0) return false;
 	}
 	return true;
 }
 
 
-void Print(double** matrix, int n, int m) {
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {
+void Print(double** matrix, int n, int m) 
+{
+	for (int i = 0; i < n; i++) 
+	{
+		for (int j = 0; j < m; j++) 
+		{
 			cout << setw(7) << matrix[i][j];
 		}
 		cout << endl;
 	}
 }
-double** RandomFill(double** matrix, int n, int m) {
+double** RandomFill(double** matrix, int n, int m) 
+{
 	srand(time(NULL));
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {
+	for (int i = 0; i < n; i++) 
+	{
+		for (int j = 0; j < m; j++) 
+		{
 			matrix[i][j] = -50 + double(rand() % 10000) / 100;
 		}
 	}
@@ -173,7 +194,8 @@ double** RandomFill(double** matrix, int n, int m) {
 	Print(matrix, n, m);
 	return matrix;
 }
-double** InputData(double** matrix, int n, int m) {
+double** InputData(double** matrix, int n, int m) 
+{
 	cout << "введите элементы матрицы" << endl;
 	cout << endl;
 	for (int i = 0; i < n; ++i)
@@ -190,4 +212,12 @@ double** InputData(double** matrix, int n, int m) {
 	return matrix;
 }
 
-
+double Sum(double* line, int size)
+{
+	double sum = 0;
+	for (int i = 0; i < size; ++i)
+	{
+		sum += line[i];
+	}
+	return sum;
+}
