@@ -1,12 +1,10 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
-#define STUD_SIZE sizeof(Student)
+#define ST_SIZE sizeof(Student)
 #include <iostream>
-#include <string>
 #include "student.h"
 #include <Windows.h>
 
 using namespace std;
-
 
 int strlen(char*);
 int strcmp(char*, char*, int, int);
@@ -18,7 +16,9 @@ void Output(Student*);
 void Open_Read(const char*);
 bool Append(const char*, Student);
 Student* DeleteEntry(FILE*);
-
+Student* SortByAlphabetic(FILE*);
+Student* SortByGroup(FILE*);
+Student* SortByAverage(FILE* f_ptr);
 
 int main()
 {
@@ -44,25 +44,61 @@ int main()
 		if (!Create_New(path))
 		{
 			cout << "Ошибка создания файла!!!!";
-			break;
 		}
 		cout << "Успешно создан новый файл " << path << endl;
 	}while(ch == 2);
 	do 
 	{
-		FILE* fp3;
-		FILE* fpt1;
-		FILE* fpt2;
+		int struct_cnt;
+		FILE* f_ptr;
 		Student Stud;
-		cout << "Выберите желаемое действие\n\n:1.Прочитать файл\n\t 2.Добавить новую запись\n\t 3.Найти студентов, имеющих не ниже 4 по математике\n\t 4.Редактировать\n\t 5.Удалить запись" << endl;
+		Student* sorted_arr;
+		Student* arr;
+		cout << "Выберите желаемое действие: \n\t 1.Сортировка \n\t 2.Прочитать файл \n\t 3.Добавить новую запись \n\t 4.Найти студентов, имеющих не ниже 4 по математике \n\t 5.Редактировать \n\t 6.Удалить запись \n\t 7.Выход" << endl;
 		cin >> select;
 		switch (select)
 		{
-
 		case 1:
-			Open_Read(FILE_PATH);
+			f_ptr = fopen(FILE_PATH, "r+");
+			cout << "\n\t 1. Сортировка по номеру группы. \n\t 2. Сортировка по имени(алфавиту). \n\t 3. Сортировка по среднему баллу. \n\t 4. Выход" << endl;
+			short sort_select;
+			cin >> sort_select;
+			switch (sort_select) 
+			{
+			case 1:
+				 sorted_arr = SortByGroup(f_ptr);
+				 struct_cnt = GetFileSize(f_ptr) / ST_SIZE;
+				 fclose(f_ptr);
+				 f_ptr = fopen(FILE_PATH, "wb");
+				 for (int i = 0; i < struct_cnt; i++)
+					 fwrite(&sorted_arr[i], ST_SIZE, 1, f_ptr);
+				 delete[] sorted_arr;
+				 break;
+			case 2:
+				sorted_arr = SortByAlphabetic(f_ptr);
+				struct_cnt = GetFileSize(f_ptr) / ST_SIZE;
+				fclose(f_ptr);
+				f_ptr = fopen(FILE_PATH, "wb");
+				for (int i = 0; i < struct_cnt; i++)
+					fwrite(&sorted_arr[i], ST_SIZE, 1, f_ptr);
+				delete[] sorted_arr;
+				break;
+			case 3:
+				sorted_arr = SortByAverage(f_ptr);
+				struct_cnt = GetFileSize(f_ptr) / ST_SIZE;
+				fclose(f_ptr);
+				f_ptr = fopen(FILE_PATH, "wb");
+				for (int i = 0; i < struct_cnt; i++)
+					fwrite(&sorted_arr[i], ST_SIZE, 1, f_ptr);
+				delete[] sorted_arr;
+				break;
+			}
+			fclose(f_ptr);
 			break;
 		case 2:
+			Open_Read(FILE_PATH);
+			break;
+		case 3:
 			cout << "Введите ФИО студента" << endl;
 			cin.ignore();
 			cin.getline(Stud.FIO, 50);
@@ -77,48 +113,132 @@ int main()
 				break;
 			};
 			break;
-		case 3:
-			fp3 = fopen(FILE_PATH, "rb");
-			while (fread(&Stud, STUD_SIZE, 1, fp3) != NULL)
+		case 4:
+			f_ptr = fopen(FILE_PATH, "rb");
+			while (fread(&Stud, ST_SIZE, 1, f_ptr) != NULL)
 			{
 				if (Stud.math_mark >= 4 && Stud.inf_mark >= 4)
 				{
 					Output(&Stud);
 				}
 			}
+			fclose(f_ptr);
 			break;
-		case 4:
-			fpt1 = fopen(FILE_PATH, "r+");
-			Edit(fpt1);
-			fclose(fpt1);
 		case 5:
-			fpt2 = fopen(FILE_PATH, "r");
-			Student* arr = DeleteEntry(fpt2);
-			int struct_cnt = ftell(fpt2) / STUD_SIZE - 1;
-			fclose(fpt2);
-			fpt2 = fopen(FILE_PATH, "wb"); //Clears the file
-			for (int i = 0; i < struct_cnt; i++)
-				fwrite(&arr[i], STUD_SIZE, 1, fpt2);
-			fclose(fpt2);
+			f_ptr = fopen(FILE_PATH, "r+");
+			Edit(f_ptr);
+			fclose(f_ptr);
 			break;
+		case 6:
+			f_ptr = fopen(FILE_PATH, "r");
+			if ((arr = DeleteEntry(f_ptr)) != NULL)
+			{
+				struct_cnt = ftell(f_ptr) / ST_SIZE - 1;
+				fclose(f_ptr);
+				f_ptr = fopen(FILE_PATH, "wb"); //Clears the file
+				for (int i = 0; i < struct_cnt; i++)
+					fwrite(&arr[i], ST_SIZE, 1, f_ptr);
+				fclose(f_ptr);
+				delete[] arr;
+				break;
+			}
+			else 
+			{
+				cout << "Ошибка удаления!" << endl;
+				fclose(f_ptr);
+				break;
+			}
 		}
-	} while (select >= 1 && select < 6);
+		_fcloseall();
+	} while (select >= 1 && select <= 6);
 	_fcloseall();
 	return 0;
 }
 
-Student* DeleteEntry(FILE* fpt2)
+Student* SortByGroup(FILE* f_ptr) 
+{
+	long struct_count = GetFileSize(f_ptr) / ST_SIZE;
+	Student temp;
+	Student* struct_arr = new Student[struct_count];
+	for (int i = 0; i < struct_count; i++)
+	{
+		fread(&struct_arr[i], ST_SIZE, 1, f_ptr);
+	}
+	for (int i = 0; i < struct_count-1; i++) 
+	{
+		for(int j = i+1; j < struct_count; ++j)
+		{
+			if (struct_arr[i].groupNumber < struct_arr[j].groupNumber) 
+			{
+				temp = struct_arr[i];
+				struct_arr[i] = struct_arr[j];
+				struct_arr[j] = temp;
+			}
+		}
+	}
+	return struct_arr;
+}
+
+Student* SortByAlphabetic(FILE* f_ptr)
+{
+	Student temp;
+	long struct_count = GetFileSize(f_ptr) / ST_SIZE;
+	Student* struct_arr = new Student[struct_count];
+	for (int i = 0; i < struct_count; i++)
+	{
+		fread(&struct_arr[i], ST_SIZE, 1, f_ptr);
+	}
+	for (int i = 0; i < struct_count - 1; i++)
+	{
+		for (int j = i + 1; j < struct_count; ++j)
+		{
+			if (strcmp(struct_arr[i].FIO, struct_arr[j].FIO, strlen(struct_arr[i].FIO), strlen(struct_arr[j].FIO)) == 1)
+			{
+				temp = struct_arr[i];
+				struct_arr[i] = struct_arr[j];
+				struct_arr[j] = temp;
+			}
+		}
+	}
+	return struct_arr;
+}
+
+Student* SortByAverage(FILE* f_ptr)
+{
+	long struct_count = GetFileSize(f_ptr) / ST_SIZE;
+	Student temp;
+	Student* struct_arr = new Student[struct_count];
+	for (int i = 0; i < struct_count; i++)
+	{
+		fread(&struct_arr[i], ST_SIZE, 1, f_ptr);
+	}
+	for (int i = 0; i < struct_count - 1; i++)
+	{
+		for (int j = i + 1; j < struct_count; ++j)
+		{
+			if (struct_arr[i].average < struct_arr[j].average)
+			{
+				temp = struct_arr[i];
+				struct_arr[i] = struct_arr[j];
+				struct_arr[j] = temp;
+			}
+		}
+	}
+	return struct_arr;
+}
+
+Student* DeleteEntry(FILE* f_ptr)
 {
 	bool flag = false;
 	char FIO[50];
 	cout << "Введите ФИО для удаления" << endl;
 	cin.ignore();
 	cin.getline(FIO, 50);
-	long struct_count = GetFileSize(fpt2) / STUD_SIZE;
+	long struct_count = GetFileSize(f_ptr) / ST_SIZE;
 	Student* struct_arr = new Student[struct_count];
 	for (int i = 0; i < struct_count; i++) 
 	{
-		fread(&struct_arr[i], STUD_SIZE, 1, fpt2);
+		fread(&struct_arr[i], ST_SIZE, 1, f_ptr);
 	}
 	for (int i = 0; i < struct_count; i++) 
 	{
@@ -133,7 +253,7 @@ Student* DeleteEntry(FILE* fpt2)
 	if (!flag) 
 	{
 		delete[] struct_arr;
-		return false;
+		return nullptr;
 	}
 	struct_count--;
 	return struct_arr;
@@ -146,11 +266,11 @@ long GetFileSize(FILE* file)
 	fseek(file, 0L, SEEK_SET);
 	return fileSize;
 }
-void Save_Entry(Student* stud, FILE* fpt1)
+void Save_Entry(Student* stud, FILE* f_ptr)
 {
-	int pos = ftell(fpt1);
-	fseek(fpt1, pos - STUD_SIZE, SEEK_SET);
-	fwrite(stud, STUD_SIZE, 1, fpt1);
+	int pos = ftell(f_ptr);
+	fseek(f_ptr, pos - ST_SIZE, SEEK_SET);
+	fwrite(stud, ST_SIZE, 1, f_ptr);
 }
 bool Create_New(const char* filePath)
 {
@@ -160,7 +280,7 @@ bool Create_New(const char* filePath)
 	return true;
 }
 
-void Edit(FILE* fpt1)
+void Edit(FILE* f_ptr)
 {
 	do 
 	{
@@ -170,17 +290,17 @@ void Edit(FILE* fpt1)
 		cout << "Введите ФИО студента для редактирования, 1 для выхода" << endl;
 		cin.ignore();
 		cin.getline(FIO, 50);
-		if (FIO == "1") break;
-		long struct_count = GetFileSize(fpt1) / STUD_SIZE;
+		if (*FIO == '1') break;
+		long struct_count = GetFileSize(f_ptr) / ST_SIZE;
 		for (int i = 0; i < struct_count; i++)
 		{
-			fread(stud, STUD_SIZE, 1, fpt1);
+			fread(stud, ST_SIZE, 1, f_ptr);
 			if (!strcmp(stud->FIO, FIO, strlen(stud->FIO), strlen(FIO)))
 			{
 				do
 				{
-					cout << "Выберите поле для редактирования: 1-ФИО\n\t 2-Номер группы\n\t 3-Оценка по физике\n\t 4-Оценка по математике\n\t 5-Оценка по иноформатике\n\t" << endl;
-					cout << "6-сохранить изменения" << endl;
+					cout << "Выберите поле для редактирования: \n\t 1-ФИО \n\t 2-Номер группы \n\t 3-Оценка по физике \n\t 4-Оценка по математике \n\t 5-Оценка по иноформатике \n\t" << endl;
+					cout << "6-сохранить изменения" << endl; 
 					cin >> select;
 					switch (select)
 					{
@@ -209,7 +329,7 @@ void Edit(FILE* fpt1)
 						stud->average = (stud->inf_mark + stud->math_mark + stud->phys_mark) / 3;
 						break;
 					case 6:
-						Save_Entry(stud, fpt1);
+						Save_Entry(stud, f_ptr);
 						break;
 					}
 				} while (select > 0 && select < 6);
@@ -249,7 +369,7 @@ bool Append(const char* filePath, Student ptr)
 {
 	FILE* fp1 = fopen(filePath, "ab");
 	if (fp1 == NULL) return false;
-	fwrite(&ptr, STUD_SIZE, 1, fp1);
+	fwrite(&ptr, ST_SIZE, 1, fp1);
 	fclose(fp1);
 	return true;
 }
