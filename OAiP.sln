@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OAiP_5", "OAiP_5\OAiP_5.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Testing", "Testing\Testing.vcxproj", "{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OAiP_7.3", "OAiP_7.3\OAiP_7.3.vcxproj", "{FE719170-0A61-4CE3-A089-1DE8B5A07E8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -111,6 +113,14 @@ Global
 		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Release|x64.Build.0 = Release|x64
 		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Release|x86.ActiveCfg = Release|Win32
 		{BD7C35BA-BACC-44F0-8AFC-8BE41F06A19B}.Release|x86.Build.0 = Release|Win32
+		{FE719170-0A61-4CE3-A089-1DE8B5A07E8A}.Debug|x64.ActiveCfg = Debug|x64
+		{FE719170-0A61-4CE3-A089-1DE8B5A07E8A}.Debug|x64.Build.0 = Debug|x64
+		{FE719170-0A61-4CE3-A089-1DE8B5A07E8A}.Debug|x86.ActiveCfg = Debug|Win32
+		{FE719170-0A61-4CE3-A089-1DE8B5A07E8A}.Debug|x86.Build.0 = Debug|Win32
+		{FE719170-0A61-4CE3-A089-1DE8B5A07E8A}.Release|x64.ActiveCfg = Release|x64
+		{FE719170-0A61-4CE3-A089-1DE8B5A07E8A}.Release|x64.Build.0 = Release|x64
+		{FE719170-0A61-4CE3-A089-1DE8B5A07E8A}.Release|x86.ActiveCfg = Release|Win32
+		{FE719170-0A61-4CE3-A089-1DE8B5A07E8A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
