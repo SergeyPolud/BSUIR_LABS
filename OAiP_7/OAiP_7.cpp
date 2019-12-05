@@ -18,7 +18,7 @@ bool Append(const char*, Student);
 Student* DeleteEntry(FILE*);
 Student* SortByAlphabetic(FILE*);
 Student* SortByGroup(FILE*);
-Student* SortByAverage(FILE* f_ptr);
+Student* SortByAverage(FILE*);
 
 int main()
 {
@@ -285,6 +285,7 @@ void Edit(FILE* f_ptr)
 	do 
 	{
 		char FIO[50];
+		bool flag = false;
 		short select;
 		Student* stud = new Student;
 		cout << "Введите ФИО студента для редактирования, 1 для выхода" << endl;
@@ -299,8 +300,9 @@ void Edit(FILE* f_ptr)
 			{
 				do
 				{
+					flag = true;
 					cout << "Выберите поле для редактирования: \n\t 1-ФИО \n\t 2-Номер группы \n\t 3-Оценка по физике \n\t 4-Оценка по математике \n\t 5-Оценка по иноформатике \n\t" << endl;
-					cout << "6-сохранить изменения" << endl; 
+					cout << "6-сохранить изменения" << endl;
 					cin >> select;
 					switch (select)
 					{
@@ -335,12 +337,8 @@ void Edit(FILE* f_ptr)
 				} while (select > 0 && select < 6);
 				break;
 			}
-			else
-			{
-				cout << "Записи о данном ФИО не существует!" << endl;
-				break;
-			}
 		}
+		if (!flag) cout << "Записи о данном ФИО не существует" << endl;
 		delete stud;
 	} while (true);
 }
