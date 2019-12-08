@@ -14,7 +14,7 @@ bool Create_New(const char*);
 void Edit(FILE*);
 void Output(Student*);
 void Open_Read(const char*);
-bool Append(const char*, Student);
+bool Append(const char*, Student*);
 Student* DeleteEntry(FILE*);
 Student* SortByAlphabetic(FILE*);
 Student* SortByGroup(FILE*);
@@ -107,7 +107,7 @@ int main()
 			cout << "Введите оценку по математике, физике, информатике через пробел." << endl;
 			cin >> Stud.math_mark >> Stud.phys_mark >> Stud.inf_mark;
 			Stud.average = (Stud.inf_mark + Stud.math_mark + Stud.phys_mark) / 3;
-			if (!Append(FILE_PATH, Stud))
+			if (!Append(FILE_PATH, &Stud))
 			{
 				cout << "Ошибка добавления!" << endl;
 				break;
@@ -363,23 +363,19 @@ void Open_Read(const char* filePath)
 	}
 	fclose(fp2);
 }
-bool Append(const char* filePath, Student ptr)
+bool Append(const char* filePath, Student* ptr)
 {
 	FILE* fp1 = fopen(filePath, "ab");
 	if (fp1 == NULL) return false;
-	fwrite(&ptr, ST_SIZE, 1, fp1);
+	fwrite(ptr, ST_SIZE, 1, fp1);
 	fclose(fp1);
 	return true;
 }
 int strcmp(char* s1, char* s2, int l1, int l2) 
 {
-	int targetSize = l1;
-	if (l2 < l1) targetSize = l2;
-	for (int i = 0; i < targetSize; i++) 
-	{
+	for (int i = 0; i < l1 && i < l2; i++) 
 		if (s1[i] > s2[i]) return 1;
 		else if (s1[i] < s2[i]) return -1;
-	}
 	return 0;
 }
 int strlen(char* str)
