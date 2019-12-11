@@ -83,7 +83,6 @@ using namespace std;
 //
 //double Y(double, int&, double);
 //double S(double, int&, double);
-//double Subtract(double, int&, double);
 //void out_rez(double t(double x, int& n, double eps), double a, double b, double h, double eps);
 //
 //
@@ -118,9 +117,6 @@ using namespace std;
 //		case 2:
 //			out_rez(S, a, b, h, eps);
 //			break;
-//		case 3:
-//			out_rez(Subtract, a, b, h, eps);
-//			break;
 //		}
 //	} while (select == 1 || select == 2 || select == 3);
 //	return 0;
@@ -153,10 +149,6 @@ using namespace std;
 //		n++;
 //	}
 //	return s;
-//}
-//double Subtract(double x, int& n, double eps)
-//{
-//	return abs(Y(x, n, eps) - S(x, n, eps));
 //}
 
 ////8.3.3

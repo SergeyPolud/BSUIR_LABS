@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int strlen(char* str);
+int strlen_custom(char* str);
 bool isDigit(char ch);
 int check_left(char* str, int pos);
 int check_right(char* stroka1, int pos);
@@ -86,7 +86,7 @@ int check_right(char* stroka1, int pos);
 //	return 0;
 //}
 
-int strlen(char* str)
+int strlen_custom(char* str)
 {
 	int length = 0;
 	while (*str++ != '\0') length++;
@@ -167,7 +167,7 @@ int main()
 	}
 	for (int i = 0; i < w_cnt-1; i++) {
 		for (int j = i + 1; j < w_cnt; j++) {
-			if (strcmp(w_arr[i], w_arr[j], strlen(w_arr[i]), strlen(w_arr[j])) == 1)
+			if (strcmp(w_arr[i], w_arr[j], strlen_custom(w_arr[i]), strlen_custom(w_arr[j])) == 1)
 			{
 				char temp[20];
 				strcpy(temp, w_arr[i]);

@@ -5,7 +5,7 @@
 using namespace std;
 
 void Encrypt(char*);
-int strlen(char*);
+int strlen_custom(char*);
 char* Decrypt(FILE* enc_ptr);
 
 int main()
@@ -30,7 +30,7 @@ int main()
 			cin.ignore();
 			cin.getline(string, 256);
 			enc_ptr = fopen(encryptedFile, "w");
-			fwrite(&string, strlen(string), 1, enc_ptr);
+			fwrite(&string, strlen_custom(string), 1, enc_ptr);
 			fclose(enc_ptr);
 			break;
 		case 2:
@@ -57,7 +57,7 @@ int main()
 			decrypted = Decrypt(enc_ptr);
 			fclose(enc_ptr);
 			enc_ptr = fopen(outputFile, "w");
-			fwrite(decrypted, strlen(decrypted), 1, enc_ptr);
+			fwrite(decrypted, strlen_custom(decrypted), 1, enc_ptr);
 			fclose(enc_ptr);
 			delete[] decrypted;
 			break;
@@ -114,7 +114,7 @@ char* Decrypt(FILE* fptr)
 	return output;
 }
 
-int strlen(char* str)
+int strlen_custom(char* str)
 {
 	int length = 0;
 	while (*str++ != '\0') length++;

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int strlen(char*);
+int strlen_custom(char*);
 int strcmp(char*, char*, int, int);
 long GetFileSize(FILE*);
 void Save_Entry(Student*, FILE*);
@@ -17,8 +17,10 @@ void Open_Read(const char*);
 bool Append(const char*, Student*);
 Student* DeleteEntry(FILE*);
 Student* SortByAlphabetic(FILE*);
-Student* SortByGroup(FILE*);
-Student* SortByAverage(FILE*);
+Student* SortByGroupDec(FILE*);
+Student* SortByGroupInc(FILE*);
+Student* SortByAverageDec(FILE*);
+Student* SortByAverageInc(FILE*);
 
 int main()
 {
@@ -40,7 +42,8 @@ int main()
 		}
 		char path[100];
 		cout << "Введите имя нового файла" << endl;
-		cin >> path;
+		cin.ignore();
+		cin.getline(path, 100);
 		if (!Create_New(path))
 		{
 			cout << "Ошибка создания файла!!!!";
@@ -59,14 +62,20 @@ int main()
 		switch (select)
 		{
 		case 1:
-			f_ptr = fopen(FILE_PATH, "r+");
+			f_ptr = fopen(FILE_PATH, "a+");
 			cout << "\n\t 1. Сортировка по номеру группы. \n\t 2. Сортировка по имени(алфавиту). \n\t 3. Сортировка по среднему баллу. \n\t 4. Выход" << endl;
 			short sort_select;
 			cin >> sort_select;
 			switch (sort_select) 
 			{
 			case 1:
-				 sorted_arr = SortByGroup(f_ptr);
+					cout << "\n\t 1. По убыванию. \n\t 2. По возрастанию." << endl;
+					cin >> sort_select;
+					if(sort_select==1)
+					sorted_arr = SortByGroupDec(f_ptr);
+					else
+					sorted_arr = SortByGroupInc(f_ptr);
+
 				 struct_cnt = GetFileSize(f_ptr) / ST_SIZE;
 				 fclose(f_ptr);
 				 f_ptr = fopen(FILE_PATH, "wb");
@@ -84,16 +93,22 @@ int main()
 				delete[] sorted_arr;
 				break;
 			case 3:
-				sorted_arr = SortByAverage(f_ptr);
+					cout << "\n\t 1. По убыванию. \n\t 2. По возрастанию." << endl;
+					cin >> sort_select;
+					if(sort_select == 1)
+						sorted_arr = SortByAverageDec(f_ptr);
+					else
+						sorted_arr = SortByAverageInc(f_ptr);
 				struct_cnt = GetFileSize(f_ptr) / ST_SIZE;
 				fclose(f_ptr);
 				f_ptr = fopen(FILE_PATH, "wb");
 				for (int i = 0; i < struct_cnt; i++)
-					fwrite(&sorted_arr[i], ST_SIZE, 1, f_ptr);
+				fwrite(&sorted_arr[i], ST_SIZE, 1, f_ptr);
 				delete[] sorted_arr;
 				break;
 			}
 			fclose(f_ptr);
+			cout << "\nФайл успешно отсортирован" << endl;
 			break;
 		case 2:
 			Open_Read(FILE_PATH);
@@ -104,7 +119,7 @@ int main()
 			cin.getline(Stud.FIO, 50);
 			cout << "Введите номер группы" << endl;
 			cin >> Stud.groupNumber;
-			cout << "Введите оценку по математике, физике, информатике через пробел." << endl;
+			cout << "Введите оценку по математике, физике, информатике." << endl;
 			cin >> Stud.math_mark >> Stud.phys_mark >> Stud.inf_mark;
 			Stud.average = (Stud.inf_mark + Stud.math_mark + Stud.phys_mark) / 3;
 			if (!Append(FILE_PATH, &Stud))
@@ -149,13 +164,37 @@ int main()
 				break;
 			}
 		}
-		_fcloseall();
 	} while (select >= 1 && select <= 6);
 	_fcloseall();
 	return 0;
 }
 
-Student* SortByGroup(FILE* f_ptr) 
+Student* SortByGroupDec(FILE* f_ptr) 
+{
+
+	long struct_count = GetFileSize(f_ptr) / ST_SIZE;
+	Student temp;
+	Student* struct_arr = new Student[struct_count];
+	fseek(f_ptr, 0, SEEK_SET);
+	for (int i = 0; i < struct_count; i++)
+	{
+		int chck = fread(&struct_arr[i], ST_SIZE, 1, f_ptr);
+	}
+	for (int i = 0; i < struct_count-1; i++) 
+	{
+		for(int j = i+1; j < struct_count; ++j)
+		{
+			if (struct_arr[i].groupNumber < struct_arr[j].groupNumber) 
+			{
+				temp = struct_arr[i];
+				struct_arr[i] = struct_arr[j];
+				struct_arr[j] = temp;
+			}
+		}
+	}
+	return struct_arr;
+}
+Student* SortByGroupInc(FILE* f_ptr)
 {
 	long struct_count = GetFileSize(f_ptr) / ST_SIZE;
 	Student temp;
@@ -164,11 +203,11 @@ Student* SortByGroup(FILE* f_ptr)
 	{
 		fread(&struct_arr[i], ST_SIZE, 1, f_ptr);
 	}
-	for (int i = 0; i < struct_count-1; i++) 
+	for (int i = 0; i < struct_count - 1; i++)
 	{
-		for(int j = i+1; j < struct_count; ++j)
+		for (int j = i + 1; j < struct_count; ++j)
 		{
-			if (struct_arr[i].groupNumber < struct_arr[j].groupNumber) 
+			if (struct_arr[i].groupNumber > struct_arr[j].groupNumber)
 			{
 				temp = struct_arr[i];
 				struct_arr[i] = struct_arr[j];
@@ -192,7 +231,7 @@ Student* SortByAlphabetic(FILE* f_ptr)
 	{
 		for (int j = i + 1; j < struct_count; ++j)
 		{
-			if (strcmp(struct_arr[i].FIO, struct_arr[j].FIO, strlen(struct_arr[i].FIO), strlen(struct_arr[j].FIO)) == 1)
+			if (strcmp(struct_arr[i].FIO, struct_arr[j].FIO, strlen_custom(struct_arr[j].FIO), strlen_custom(struct_arr[j].FIO)) == 1)
 			{
 				temp = struct_arr[i];
 				struct_arr[i] = struct_arr[j];
@@ -203,7 +242,7 @@ Student* SortByAlphabetic(FILE* f_ptr)
 	return struct_arr;
 }
 
-Student* SortByAverage(FILE* f_ptr)
+Student* SortByAverageDec(FILE* f_ptr)
 {
 	long struct_count = GetFileSize(f_ptr) / ST_SIZE;
 	Student temp;
@@ -217,6 +256,30 @@ Student* SortByAverage(FILE* f_ptr)
 		for (int j = i + 1; j < struct_count; ++j)
 		{
 			if (struct_arr[i].average < struct_arr[j].average)
+			{
+				temp = struct_arr[i];
+				struct_arr[i] = struct_arr[j];
+				struct_arr[j] = temp;
+			}
+		}
+	}
+	return struct_arr;
+}
+
+Student* SortByAverageInc(FILE* f_ptr)
+{
+	long struct_count = GetFileSize(f_ptr) / ST_SIZE;
+	Student temp;
+	Student* struct_arr = new Student[struct_count];
+	for (int i = 0; i < struct_count; i++)
+	{
+		fread(&struct_arr[i], ST_SIZE, 1, f_ptr);
+	}
+	for (int i = 0; i < struct_count - 1; i++)
+	{
+		for (int j = i + 1; j < struct_count; ++j)
+		{
+			if (struct_arr[i].average > struct_arr[j].average)
 			{
 				temp = struct_arr[i];
 				struct_arr[i] = struct_arr[j];
@@ -242,7 +305,7 @@ Student* DeleteEntry(FILE* f_ptr)
 	}
 	for (int i = 0; i < struct_count; i++) 
 	{
-		if (!strcmp(struct_arr[i].FIO, FIO, strlen(struct_arr[i].FIO), strlen(FIO)))
+		if (!strcmp(struct_arr[i].FIO, FIO, strlen_custom(struct_arr[i].FIO), strlen_custom(FIO)))
 		{
 			flag = true;
 			for (int j = i; j < struct_count-1; j++) 
@@ -296,7 +359,7 @@ void Edit(FILE* f_ptr)
 		for (int i = 0; i < struct_count; i++)
 		{
 			fread(stud, ST_SIZE, 1, f_ptr);
-			if (!strcmp(stud->FIO, FIO, strlen(stud->FIO), strlen(FIO)))
+			if (!strcmp(stud->FIO, FIO, strlen_custom(stud->FIO), strlen_custom(FIO)))
 			{
 				do
 				{
@@ -378,7 +441,7 @@ int strcmp(char* s1, char* s2, int l1, int l2)
 		else if (s1[i] < s2[i]) return -1;
 	return 0;
 }
-int strlen(char* str)
+int strlen_custom(char* str)
 {
 	int length = 0;
 	while (*str++ != '\0') length++;
