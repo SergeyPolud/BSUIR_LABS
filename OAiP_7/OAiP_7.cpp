@@ -13,8 +13,9 @@ void Save_Entry(Student*, FILE*);
 bool Create_New(const char*);
 void Edit(FILE*);
 void Output(Student*);
-void Open_Read(const char*);
+void Read(const char*);
 bool Append(const char*, Student*);
+void OutputToFile(FILE*, Student*);
 Student* DeleteEntry(FILE*);
 Student* SortByAlphabetic(FILE*);
 Student* SortByGroupDec(FILE*);
@@ -54,6 +55,7 @@ int main()
 	{
 		int struct_cnt;
 		FILE* f_ptr;
+		FILE* out_file;
 		Student Stud;
 		Student* sorted_arr;
 		Student* arr;
@@ -111,7 +113,7 @@ int main()
 			cout << "\nФайл успешно отсортирован" << endl;
 			break;
 		case 2:
-			Open_Read(FILE_PATH);
+			Read(FILE_PATH);
 			break;
 		case 3:
 			cout << "Введите ФИО студента" << endl;
@@ -121,22 +123,26 @@ int main()
 			cin >> Stud.groupNumber;
 			cout << "Введите оценку по математике, физике, информатике." << endl;
 			cin >> Stud.math_mark >> Stud.phys_mark >> Stud.inf_mark;
-			Stud.average = (Stud.inf_mark + Stud.math_mark + Stud.phys_mark) / 3;
+			Stud.average = (double)(Stud.inf_mark + Stud.math_mark + Stud.phys_mark) / 3;
 			if (!Append(FILE_PATH, &Stud))
 			{
 				cout << "Ошибка добавления!" << endl;
 				break;
-			};
+			}
+			else cout << "Запись успешно добавлена" << endl;
 			break;
 		case 4:
 			f_ptr = fopen(FILE_PATH, "rb");
+			out_file = fopen("РешениеИЗ.txt", "w");
 			while (fread(&Stud, ST_SIZE, 1, f_ptr) != NULL)
 			{
 				if (Stud.math_mark >= 4 && Stud.inf_mark >= 4)
 				{
 					Output(&Stud);
+					OutputToFile(out_file, &Stud);
 				}
 			}
+			fclose(out_file);
 			fclose(f_ptr);
 			break;
 		case 5:
@@ -155,6 +161,7 @@ int main()
 					fwrite(&arr[i], ST_SIZE, 1, f_ptr);
 				fclose(f_ptr);
 				delete[] arr;
+				cout << "Запись удалена успешно!" << endl;
 				break;
 			}
 			else 
@@ -313,12 +320,11 @@ Student* DeleteEntry(FILE* f_ptr)
 			break;
 		}
 	}
-	if (!flag) 
+	if (!flag)
 	{
 		delete[] struct_arr;
 		return nullptr;
 	}
-	struct_count--;
 	return struct_arr;
 }
 
@@ -350,7 +356,7 @@ void Edit(FILE* f_ptr)
 		char FIO[50];
 		bool flag = false;
 		short select;
-		Student* stud = new Student;
+		Student stud;
 		cout << "Введите ФИО студента для редактирования, 1 для выхода" << endl;
 		cin.ignore();
 		cin.getline(FIO, 50);
@@ -358,8 +364,8 @@ void Edit(FILE* f_ptr)
 		long struct_count = GetFileSize(f_ptr) / ST_SIZE;
 		for (int i = 0; i < struct_count; i++)
 		{
-			fread(stud, ST_SIZE, 1, f_ptr);
-			if (!strcmp(stud->FIO, FIO, strlen_custom(stud->FIO), strlen_custom(FIO)))
+			fread(&stud.FIO, ST_SIZE, 1, f_ptr);
+			if (!strcmp(stud.FIO, FIO, strlen_custom(stud.FIO), strlen_custom(FIO)))
 			{
 				do
 				{
@@ -372,29 +378,29 @@ void Edit(FILE* f_ptr)
 					case 1:
 						cout << "Введите новое ФИО" << endl;
 						cin.ignore();
-						cin.getline(stud->FIO, 50);
+						cin.getline(stud.FIO, 50);
 						break;
 					case 2:
 						cout << "введите новый номер группы" << endl;
-						cin >> stud->groupNumber;
+						cin >> stud.groupNumber;
 						break;
 					case 3:
 						cout << "Введите новую Оценку по физике" << endl;
-						cin >> stud->phys_mark;
-						stud->average = (stud->inf_mark + stud->math_mark + stud->phys_mark) / 3;
+						cin >> stud.phys_mark;
+						stud.average = (double)(stud.inf_mark + stud.math_mark + stud.phys_mark) / 3.;
 						break;
 					case 4:
 						cout << "Введите новую Оценку по математике" << endl;
-						cin >> stud->math_mark;
-						stud->average = (stud->inf_mark + stud->math_mark + stud->phys_mark) / 3;
+						cin >> stud.math_mark;
+						stud.average = (double)(stud.inf_mark + stud.math_mark + stud.phys_mark) / 3.;
 						break;
 					case 5:
 						cout << "Введите новую Оценку по информматике" << endl;
-						cin >> stud->inf_mark;
-						stud->average = (stud->inf_mark + stud->math_mark + stud->phys_mark) / 3;
+						cin >> stud.inf_mark;
+						stud.average = (double)(stud.inf_mark + stud.math_mark + stud.phys_mark) / 3.;
 						break;
 					case 6:
-						Save_Entry(stud, f_ptr);
+						Save_Entry(&stud, f_ptr);
 						break;
 					}
 				} while (select > 0 && select < 6);
@@ -402,7 +408,6 @@ void Edit(FILE* f_ptr)
 			}
 		}
 		if (!flag) cout << "Записи о данном ФИО не существует" << endl;
-		delete stud;
 	} while (true);
 }
 void Output(Student* stud)
@@ -415,15 +420,19 @@ void Output(Student* stud)
 	cout << "Средний балл " << stud->average << endl;
 	cout << "=========================++++++++++++============================" << endl;
 }
-void Open_Read(const char* filePath)
+void Read(const char* filePath)
 {
 	FILE* fp2 = fopen(filePath, "rb");
 	Student st;
+	bool flag = false;
 	while (true)
 	{
+		
 		if (!fread(&st, sizeof(Student), 1, fp2)) break;
+		flag = true;
 		Output(&st);
 	}
+	if (!flag) cout << "Файл пуст!" << endl;
 	fclose(fp2);
 }
 bool Append(const char* filePath, Student* ptr)
@@ -446,4 +455,15 @@ int strlen_custom(char* str)
 	int length = 0;
 	while (*str++ != '\0') length++;
 	return length;
+}
+void OutputToFile(FILE* out_file, Student* Stud)
+{
+	fprintf(out_file, "%s", "-----------------------------\n");
+	fprintf(out_file, "Имя -- %s\n", Stud->FIO);
+	fprintf(out_file, "Группа -- %d\n", Stud->groupNumber);
+	fprintf(out_file, "Оценка по математике -- %i\n", Stud->math_mark);
+	fprintf(out_file, "Оценка по информатике -- %i\n", Stud->inf_mark);
+	fprintf(out_file, "Оценка по физике -- %i\n", Stud->phys_mark);
+	fprintf(out_file, "Средний балл -- %lf\n", Stud->average);
+	fprintf(out_file, "%s", "-----------------------------\n");
 }
